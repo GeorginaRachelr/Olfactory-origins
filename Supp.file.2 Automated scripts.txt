@@ -1,0 +1,37 @@
+## Automated script to create a blastdb for each genome in file (each file ending .fa)
+for i in *.fa
+do
+    echo "making blast db of $i"
+    makeblastdb -in $i -dbtype prot -parse_seqids -out mydb_$i -title genomedb_$i
+    echo "done $i"
+done
+
+
+## PSI-BLAST run
+while read k; do
+    echo "extracting sequences from $k"
+    psiblast -query human_OR_16.txt -db $k -out psiblast3_$k -evalue 1e-4 -max_target_seqs 10000 -outfmt 6 ‘qseqid sseqid qstart qend sstart ssend pident evalue sseq ’
+
+    echo "done $k"
+done < dbnames
+
+
+## Sequence extraction from PSI-BLAST output
+ls mydb* | awk ‘/mydb_..../{ print substr($0, index($0, “mydb_”) -4, 13);)}’ db_names | uniq > dbnames
+for i in psiblast3_mydb_*
+do
+    awk ‘{print “>” $2 “_” $1 “\n” $8}’ $i > seqs_$i
+    echo “done $i”
+done
+
+
+## HMMER run
+hmmbuild –amino human_OR.hmm human_OR_aln.fasta
+hmmsearch -e 1e-3 -A Aque_aln.sto Aque.fa > Aque_hmm_seqs
+esl-reformat fasta Aque_aln.sto > seqs_hmmer_Aque.fa
+
+
+## InterProScan
+./interproscan.sh -i sequence_file.fa
+### contents of interproscan.sh not disclosed
+awk '{IGNORECASE=1} /gpcr|olfactory|g.protein.coupled.receptor|rhodopsin/ {print $0}' interproscan_output.tsv > filtered_sequences
