@@ -3,7 +3,11 @@ Supplementary material to Master's theses: Investigating the Origin of the Olfac
 
 Supp.file 1 Amino acid sequence of 16 human OR genes
 
+- Correspond to red branches marked in Fig 1.
+
 Supp.file.2 Automated scripts
+
+- Bespoke UNIX scripts from PSI-BLAST, HMMER, sequence extraction from outputs and InterProScan Annotation
 
 Supp.file.3 NJ tree of 9345 GPCRs
 
